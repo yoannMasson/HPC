@@ -31,26 +31,71 @@ Matrix DufortFrankel::computeSolution(){
 		}
 	}
 
+	//INDEX ATTRIBUTION
+	int startIndex,lastIndex,offset ;
+
+	if(npes < m.getNcols()){//Dividing work between proc
+		offset = ((double)1/npes)*m.getNcols();
+		startIndex = offset*myRank ;
+		if(myRank == npes -1 ){
+			lastIndex = m.getNcols()-1;
+		}else{
+			lastIndex = startIndex + offset-1;
+		}
+	}else{//one processor for one space step
+		startIndex = myRank;
+		lastIndex = myRank;
+	}
+
+	std::cout << "From processor " << myRank << " I start at " << startIndex << "and finish at " << lastIndex << "\n";
+
 
 	double r = D*dt/(dx*dx);
-	//Calcul
+	//CALCUL
 	for (int i = 0; i < nRows-1; i++) {
-		if(i == 0){//Special case where m[i-1] makes not sense
-			for (int j = 1; j < nCols-1; j++) {
-				m[i+1][j] = (Tin +2*r*(m[i][j+1]-Tin+m[i][j-1]))/(1+2*r);
+		if(i == 0){//Special case where m[i-1][j] makes not sense
+			for (int j = startIndex; j <= lastIndex ; j++) {
+				if(j == 0){
+					if(startIndex == lastIndex){
+						//MPI_ISEND();
+					}
+				}else{
+					if(j == startIndex){
+						//MPI_RECIEVE()
+					}
+					m[i+1][j] = (Tin +2*r*(m[i][j+1]-Tin+m[i][j-1]))/(1+2*r);
+					if(j == lastIndex){
+						//MPI_ISEND();
+					}
+				}
 			}
 		}else{
-			for (int j = 1; j < nCols-1; j++) {
-				m[i+1][j] = (m[i-1][j] +2*r*(m[i][j+1]-m[i-1][j]+m[i][j-1]))/(1+2*r);
+
+			for (int j = startIndex; j <= lastIndex ; j++) {
+				if(j == 0){
+					if(startIndex == lastIndex){
+						//MPI_ISEND();
+					}
+				}else{
+					if(j == startIndex){
+						//MPI_RECIEVE()
+					}
+					m[i+1][j] = (m[i-1][j] +2*r*(m[i][j+1]-m[i-1][j]+m[i][j-1]))/(1+2*r);
+					if(j == lastIndex){
+						//MPI_ISEND();
+					}
+				}
+
+
+
 			}
+
 		}
-
+		(*this).computedSolution = m;
+		return m;
 	}
-	(*this).computedSolution = m;
-	return m;
-}
 
-DufortFrankel::~DufortFrankel() {
-	// TODO Auto-generated destructor stub
-}
+	DufortFrankel::~DufortFrankel() {
+		// TODO Auto-generated destructor stub
+	}
 
