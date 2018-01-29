@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
 
 	if(myRank == 0){
-		cout << *solution;
+		cout << solution->getComputedSolution();
 		/*Matrix error = solution->getComputedSolution()-analytic.getComputedSolution();
 		cout << "it took "<< t1-t0 << " ms to compute" << endl;
 		cout << "ERRORS: "<< endl;

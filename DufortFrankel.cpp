@@ -8,11 +8,11 @@
 #include "DufortFrankel.h"
 
 #include <cmath>
+#include "mpi.h"
 
-
-
+using namespace std;
 DufortFrankel::DufortFrankel(double dx, double dt, double L, double T, double D, double Tsur, double Tin,int npes, int myRank ):
-Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
+						Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
 
 Matrix DufortFrankel::computeSolution(){
 
@@ -35,67 +35,102 @@ Matrix DufortFrankel::computeSolution(){
 	int startIndex,lastIndex,offset ;
 
 	if(npes < m.getNcols()){//Dividing work between proc
-		offset = ((double)1/npes)*m.getNcols();
-		startIndex = offset*myRank ;
+		offset = ((double)1/npes)*(m.getNcols()-2);
+		startIndex = offset*myRank+1 ;
 		if(myRank == npes -1 ){
-			lastIndex = m.getNcols()-1;
+			lastIndex = m.getNcols()-2;
 		}else{
 			lastIndex = startIndex + offset-1;
 		}
 	}else{//one processor for one space step
-		startIndex = myRank;
-		lastIndex = myRank;
+		startIndex = myRank+1;
+		lastIndex = myRank+1;
 	}
 
 	std::cout << "From processor " << myRank << " I start at " << startIndex << "and finish at " << lastIndex << "\n";
 
 
 	double r = D*dt/(dx*dx);
+
 	//CALCUL
+	MPI_Request request;
+	MPI_Status status;
+	int tag;
+	double previous,following;
+
 	for (int i = 0; i < nRows-1; i++) {
-		if(i == 0){//Special case where m[i-1][j] makes not sense
-			for (int j = startIndex; j <= lastIndex ; j++) {
-				if(j == 0){
-					if(startIndex == lastIndex){
-						//MPI_ISEND();
-					}
-				}else{
-					if(j == startIndex){
-						//MPI_RECIEVE()
-					}
-					m[i+1][j] = (Tin +2*r*(m[i][j+1]-Tin+m[i][j-1]))/(1+2*r);
-					if(j == lastIndex){
-						//MPI_ISEND();
-					}
+		if(i == 0){//Special case where m[i-1][j] makes not sense. We don't need result from previous line at this stage
+			for(int j = startIndex; j <= lastIndex;j++){
+				m[i+1][j] = (Tin +2*r*(m[i][j+1]-Tin+m[i][j-1]))/(1+2*r);
+				if(myRank != 0){//Send result back to proc 0
+					tag = (i+1)+j*m.getNcols();
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,0,tag,MPI_COMM_WORLD,&request);
 				}
 			}
-		}else{
+
+
+		}else{//When the current j is at the "processor boundaries" we need to send and recieve
 
 			for (int j = startIndex; j <= lastIndex ; j++) {
-				if(j == 0){
-					if(startIndex == lastIndex){
-						//MPI_ISEND();
-					}
-				}else{
-					if(j == startIndex){
-						//MPI_RECIEVE()
-					}
-					m[i+1][j] = (m[i-1][j] +2*r*(m[i][j+1]-m[i-1][j]+m[i][j-1]))/(1+2*r);
-					if(j == lastIndex){
-						//MPI_ISEND();
-					}
+				following = m[i][j+1];
+				previous = m[i][j-1];
+				if(j == startIndex && myRank != 0){
+					tag = i+(j-1)*m.getNcols();
+					MPI_Recv(&previous,1,MPI_DOUBLE,myRank-1,tag,MPI_COMM_WORLD,&status);
+
 				}
+				if(j == lastIndex && myRank != npes-1){
+					tag = i+(j+1)*m.getNcols();
+					MPI_Recv(&following,1,MPI_DOUBLE,myRank+1,tag,MPI_COMM_WORLD,&status);
+
+				}
+				m[i+1][j] = (m[i-1][j] +2*r*(following-m[i-1][j]+previous))/(1+2*r);
+				tag = (i+1)+(j)*m.getNcols();
+				if(j == startIndex && myRank != 0){
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,myRank-1,tag,MPI_COMM_WORLD,&request);
+				}
+				if(j == lastIndex && myRank != npes -1){
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,0,tag,MPI_COMM_WORLD,&request);
+
+				}
+				cout << m[i+1][j] <<endl;
+			}
 
 
+
+		}
+
+	}
+
+	if(myRank == 0){//Waiting for results
+		int waitStartIndex,waitLastIndex;
+		double result;
+		for(int rank = 1; rank < npes ; rank++){
+			waitStartIndex = rank*offset+1;
+			if( rank == npes -1){
+				waitLastIndex = m.getNcols()-2;
+			}else{
+				waitLastIndex = waitStartIndex + offset - 1;
+			}
+			//cout << "Waiting for proc number " << i << " to give me result from " << waitStartIndex << " to " << waitLastIndex << "\n";
+			for(int i = 1 ; i < 2; i ++ ){
+				for( int j = waitStartIndex; j <= waitLastIndex ; j ++){
+					tag = i+j*m.getNcols();
+					//cout << "Waiting for i:"<<i<<" j: "<<j<<" from rank: "<<rank << endl;
+					MPI_Recv(&result,1,MPI_DOUBLE,rank,tag,MPI_COMM_WORLD,&status);
+					m[i][j] = result;
+				}
 
 			}
 
 		}
-		(*this).computedSolution = m;
-		return m;
 	}
 
-	DufortFrankel::~DufortFrankel() {
-		// TODO Auto-generated destructor stub
-	}
+	(*this).computedSolution = m;
+	return m;
+}
+
+DufortFrankel::~DufortFrankel() {
+	// TODO Auto-generated destructor stub
+}
 
