@@ -1,12 +1,12 @@
 #include <iostream>
 #include "Analytic.h"
 #include "Laasonen.h"
-#include "DufortFrankel.h"
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include "CrankNicolson.h"
 #include <mpi.h>
+#include "FTCS.h"
 
 
 using namespace std;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 	ofstream f;
 
 	Analytic analytic(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);//Use to compute errors
-	DufortFrankel dufortFrankel(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
+	FTCS dufortFrankel(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 	Laasonen laasonen(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 	CrankNicolson crankNicholson(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 
@@ -76,6 +76,9 @@ int main(int argc, char *argv[]) {
 
 	if(myRank == 0){
 		cout << solution->getComputedSolution();
+		cout << setprecision(8);
+		cout << t1-t0;
+
 		/*Matrix error = solution->getComputedSolution()-analytic.getComputedSolution();
 		cout << "it took "<< t1-t0 << " ms to compute" << endl;
 		cout << "ERRORS: "<< endl;

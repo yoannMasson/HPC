@@ -5,16 +5,16 @@
  *      Author: yoann
  */
 
-#include "DufortFrankel.h"
+#include "FTCS.h"
 
 #include <cmath>
 #include "mpi.h"
 
 using namespace std;
-DufortFrankel::DufortFrankel(double dx, double dt, double L, double T, double D, double Tsur, double Tin,int npes, int myRank ):
-						Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
+FTCS::FTCS(double dx, double dt, double L, double T, double D, double Tsur, double Tin,int npes, int myRank ):
+														Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
 
-Matrix DufortFrankel::computeSolution(){
+Matrix FTCS::computeSolution(){
 
 	Matrix m = getComputedSolution();
 	int nRows = m.getNrows();
@@ -58,13 +58,20 @@ Matrix DufortFrankel::computeSolution(){
 	int tag;
 	double previous,following;
 
-	for (int i = 0; i < nRows-1; i++) {
-		if(i == 0){//Special case where m[i-1][j] makes not sense. We don't need result from previous line at this stage
+	for (int i = 0; i < m.getNrows()-1; i++) {
+		if(i == 0){//Special case where don't need result from previous line
 			for(int j = startIndex; j <= lastIndex;j++){
-				m[i+1][j] = (Tin +2*r*(m[i][j+1]-Tin+m[i][j-1]))/(1+2*r);
+				m[i+1][j] = r*(m[i][j+1]-2*m[i][j]+m[i][j-1])+m[i][j];
 				if(myRank != 0){//Send result back to proc 0
-					tag = (i+1)+j*m.getNcols();
+					tag = (i+1)*m.getNcols()+j;
 					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,0,tag,MPI_COMM_WORLD,&request);
+					if(j==startIndex){
+						MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,myRank-1,tag,MPI_COMM_WORLD,&request);
+					}
+				}
+				if(j == lastIndex && myRank != npes -1){
+					tag = (i+1)*m.getNcols()+j;
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,myRank+1,tag,MPI_COMM_WORLD,&request);
 				}
 			}
 
@@ -72,28 +79,32 @@ Matrix DufortFrankel::computeSolution(){
 		}else{//When the current j is at the "processor boundaries" we need to send and recieve
 
 			for (int j = startIndex; j <= lastIndex ; j++) {
-				following = m[i][j+1];
+
 				previous = m[i][j-1];
+				following = m[i][j+1];
+
 				if(j == startIndex && myRank != 0){
-					tag = i+(j-1)*m.getNcols();
+					tag = i*m.getNcols()+j-1;
 					MPI_Recv(&previous,1,MPI_DOUBLE,myRank-1,tag,MPI_COMM_WORLD,&status);
 
 				}
 				if(j == lastIndex && myRank != npes-1){
-					tag = i+(j+1)*m.getNcols();
+					tag = i*m.getNcols()+j+1;
 					MPI_Recv(&following,1,MPI_DOUBLE,myRank+1,tag,MPI_COMM_WORLD,&status);
 
 				}
-				m[i+1][j] = (m[i-1][j] +2*r*(following-m[i-1][j]+previous))/(1+2*r);
-				tag = (i+1)+(j)*m.getNcols();
+				m[i+1][j] = r*(following-2*m[i][j]+previous)+m[i][j];
+				tag = (i+1)*m.getNcols()+j;
+				if(myRank != 0){//Send result back to proc 0
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,0,tag,MPI_COMM_WORLD,&request);
+				}
 				if(j == startIndex && myRank != 0){
 					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,myRank-1,tag,MPI_COMM_WORLD,&request);
 				}
 				if(j == lastIndex && myRank != npes -1){
-					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,0,tag,MPI_COMM_WORLD,&request);
-
+					MPI_Isend(&m[i+1][j],1,MPI_DOUBLE,myRank+1,tag,MPI_COMM_WORLD,&request);
 				}
-				cout << m[i+1][j] <<endl;
+				//	cout << m[i][j+1]<<endl;
 			}
 
 
@@ -113,10 +124,10 @@ Matrix DufortFrankel::computeSolution(){
 				waitLastIndex = waitStartIndex + offset - 1;
 			}
 			//cout << "Waiting for proc number " << i << " to give me result from " << waitStartIndex << " to " << waitLastIndex << "\n";
-			for(int i = 1 ; i < 2; i ++ ){
+			for(int i = 1 ; i < m.getNrows(); i ++ ){
 				for( int j = waitStartIndex; j <= waitLastIndex ; j ++){
-					tag = i+j*m.getNcols();
-					//cout << "Waiting for i:"<<i<<" j: "<<j<<" from rank: "<<rank << endl;
+					tag = j+i*m.getNcols();
+					cout << "Waiting for i:"<<i<<" j: "<<j<<" from rank: "<<rank << endl;
 					MPI_Recv(&result,1,MPI_DOUBLE,rank,tag,MPI_COMM_WORLD,&status);
 					m[i][j] = result;
 				}
@@ -130,7 +141,7 @@ Matrix DufortFrankel::computeSolution(){
 	return m;
 }
 
-DufortFrankel::~DufortFrankel() {
+FTCS::~FTCS() {
 	// TODO Auto-generated destructor stub
 }
 

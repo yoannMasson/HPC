@@ -80,7 +80,7 @@ std::ostream& operator<<(std::ostream& os, Solver& s) {
 		os << "The matrix elements are" << std::endl;
 		double T = 0.0;
 		int i,t = 0;
-		for(double T=0.0; T <= 0.5 ; T = T + 0.1){
+		for(double T=0.5; T <= 0.5 ; T = T + 0.1){
 			os << "T = " << T << " -> ";
 			i = T/s.getDT();
 			for (int j=0;j<m.getNcols();j++) {

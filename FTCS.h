@@ -1,7 +1,7 @@
 
 
-#ifndef DUFORTFRANKEL_H_
-#define DUFORTFRANKEL_H_
+#ifndef FTCS_H_
+#define FTCS_H_
 
 /*
  * CrankNicholson.h
@@ -15,7 +15,7 @@
 
 #include "Solver.h"
 
-class DufortFrankel: public Solver {
+class FTCS: public Solver {
 public:
 
 	//CONSTRUCTOR
@@ -28,7 +28,7 @@ public:
 	 * @exception invalid_argument ("L should be equal or larger than dx")
 	 * @exception invalid_argument ("T should be equal or larger than dt")
 	 */
-	DufortFrankel(double dx/**< double. distance between two space steps */,
+	FTCS(double dx/**< double. distance between two space steps */,
 			 double dt/**< double. time between two time steps */,
 			 double L/**< double. width of the 1D material to consider */,
 			 double T/**< double. Total time of the considerated problem */,
@@ -43,7 +43,7 @@ public:
 	 *  @see getComputedSolution()
 	 */
 	Matrix virtual computeSolution();
-	virtual ~DufortFrankel();
+	virtual ~FTCS();
 };
 
-#endif /* DUFORTFRANKEL_H_ */
+#endif /* FTCS_H_ */
