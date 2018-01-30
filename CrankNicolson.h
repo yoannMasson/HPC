@@ -48,11 +48,7 @@ public:
 	Matrix virtual computeSolution();
 	virtual ~CrankNicolson();
 private:
-	Vector resolveOneStep(Vector bottomDiagonal,
-			Vector diagonal,
-			Vector upDiagonal,
-			Vector resultDiagonal,
-			Vector &f);
+	void ThomasAlgorithm_P( int N, double *b,double *a, double *c, double *x, double *q);
 };
 
 #endif /* CRANKNICOLSON_H_ */

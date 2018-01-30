@@ -1,0 +1,1 @@
+plot "timeFTCS" using 1:2 title 'computation time' with line

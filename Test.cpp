@@ -21,7 +21,7 @@ const double DT = 0.01;
 
 int main(int argc, char *argv[]) {
 
-	char choice('1');
+	char choice('3');
 	double t0,t1;
 
 	MPI_Init(&argc, &argv);

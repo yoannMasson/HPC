@@ -1,0 +1,5 @@
+\contentsline {chapter}{\numberline {1}Explicit solver: FTCS}{3}
+\contentsline {section}{\numberline {1.1}Theory}{3}
+\contentsline {section}{\numberline {1.2}Results}{5}
+\contentsline {subsection}{\numberline {1.2.1}Numerical value}{5}
+\contentsline {subsection}{\numberline {1.2.2}Time performance}{6}
