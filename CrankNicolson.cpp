@@ -13,7 +13,7 @@
 using namespace std;
 
 CrankNicolson::CrankNicolson(double dx, double dt, double L, double T, double D, double Tsur, double Tin, int npes, int myRank ):
-																		Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
+																				Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
 
 
 Matrix CrankNicolson::computeSolution(){
@@ -62,17 +62,21 @@ Matrix CrankNicolson::computeSolution(){
 	//Filling resultVector with init value
 
 
+	resultVector[0] =  C*f[1]+(1-2*C)*f[0]+C*Tsur;
+	resultVector[nCols - 1] =  C*Tsur+(1-2*C)*f[nCols - 1]+C*f[nCols - 2];
+	resultVector[0] += C*Tsur;
+	resultVector[nCols-1] += C*Tsur;
 
 	//Calcul
 	for (int timeStep = 1; timeStep < nRows; timeStep++) {
 
+
 		resultVector[0] =  C*f[1]+(1-2*C)*f[0]+C*Tsur;
-			resultVector[nCols - 1] =  C*Tsur+(1-2*C)*f[nCols - 1]+C*f[nCols - 2];
-			resultVector[0] += C*Tsur;
-			resultVector[nCols-1] += C*Tsur;
-			for(int i = 1 ; i < nCols-1 ; i++){
-				resultVector[i] = C*f[i+1]+(1-2*C)*f[i]+C*f[i-1];
-			}
+		resultVector[nCols - 1] =  C*Tsur+(1-2*C)*f[nCols - 1]+C*f[nCols - 2];
+
+		for(int i = 1 ; i < nCols-1 ; i++){
+			resultVector[i] = C*f[i+1]+(1-2*C)*f[i]+C*f[i-1];
+		}
 
 		//Filling resultVector with init value
 		ThomasAlgorithm_P(nCols,bottomDiagonal,diagonal,upDiagonal,f,resultVector);
@@ -92,7 +96,6 @@ Matrix CrankNicolson::computeSolution(){
 			m[timeStep][i+1]  = resultVector[i];
 			f[i] = resultVector[i];
 		}
-
 	}
 
 	(*this).computedSolution = m;
@@ -101,7 +104,7 @@ Matrix CrankNicolson::computeSolution(){
 
 
 void CrankNicolson::ThomasAlgorithm_P( int N, double *b,double *a, double *c, double *x, double *q){
-	int i,j,k;
+	int i;
 	int rows_local,local_offset;
 	double S[2][2],T[2][2],s1tmp,s2tmp;
 	double *l,*d,*y;
