@@ -13,7 +13,7 @@
 using namespace std;
 
 Laasonen::Laasonen(double dx, double dt, double L, double T, double D, double Tsur, double Tin, int npes, int myRank ):
-																				Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
+																																										Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
 
 
 Matrix Laasonen::computeSolution(){
@@ -24,8 +24,8 @@ Matrix Laasonen::computeSolution(){
 	double const C = D*dt/(2*dx*dx);
 
 
-	double *bottomDiagonal = new double[nCols-1];//The upper diagonal of the triangle matrix A of the system A.F = D
-	double *upDiagonal = new double[nCols-1];//The upper diagonal of the triangle matrix A of the system A.F = D
+	double *bottomDiagonal = new double[nCols];//The upper diagonal of the triangle matrix A of the system A.F = D
+	double *upDiagonal = new double[nCols];//The upper diagonal of the triangle matrix A of the system A.F = D
 	double *diagonal = new double[nCols];//The main diagonal of the triangle matrix A of the system A.F = D
 	double *resultVector = new double[nCols];//The D vector of the system A.F = D;
 	double *f = new double [nCols];//The f vector of the previus iteration
@@ -46,55 +46,55 @@ Matrix Laasonen::computeSolution(){
 		diagonal[i] = 1+2*C;
 	}
 
-	for(int i = 0; i< nCols-1 ; i++){
+	for(int i = 0; i< nCols ; i++){
 		upDiagonal[i] = -C;
 	}
 
-	for(int i = 0; i< nCols-1 ; i++){
+	for(int i = 0; i< nCols ; i++){
 		bottomDiagonal[i] = -C;
 	}
 
-	//f is the fist time step at initialization
-	for(int j = 0 ; j < nCols; j++){
-		f[j] = Tin;
+	for(int i = 0 ; i < nCols ; i++){
+		resultVector[i] = m[0][i+1];
 	}
 
-	//Filling resultVector with init value
-
-
-	resultVector[0] =  C*f[1]+(1-2*C)*f[0]+C*Tsur;
-	resultVector[nCols - 1] =  C*Tsur+(1-2*C)*f[nCols - 1]+C*f[nCols - 2];
-	resultVector[0] += C*Tsur;
-	resultVector[nCols-1] += C*Tsur;
+	//f is the fist time step at initialization
+	for(int i = 0 ; i < nCols; i++){
+		f[i] = Tin;
+	}
 
 	//Calcul
 	for (int timeStep = 1; timeStep < nRows; timeStep++) {
 
-
-		resultVector[0] =  C*f[1]+(1-2*C)*f[0]+C*Tsur;
-		resultVector[nCols - 1] =  C*Tsur+(1-2*C)*f[nCols - 1]+C*f[nCols - 2];
-
-		for(int i = 1 ; i < nCols-1 ; i++){
-			resultVector[i] = C*f[i+1]+(1-2*C)*f[i]+C*f[i-1];
+		for(int i = 0 ; i < nCols ; i++){
+			resultVector[i] = f[i];
 		}
-
-		//Filling resultVector with init value
+		resultVector[0] += C*Tsur;
+		resultVector[nCols-1] += C*Tsur;
 		ThomasAlgorithm_P(nCols,bottomDiagonal,diagonal,upDiagonal,f,resultVector);
 
-		if(myRank == 0){
-			for(int i = 1; i < nCols; i++){
-				//m[timeStep][i] = f[i-1];
-				//resultVector[i-1] = f[i-1];
-			}
-
-			for(int i = 0; i < nCols ; i++){
-				cout << resultVector[i] << " ";
-			}
-			cout <<endl;
-		}
 		for(int i = 0; i < nCols ; i++){
-			m[timeStep][i+1]  = resultVector[i];
 			f[i] = resultVector[i];
+			m[timeStep][i+1] = f[i];
+		}
+
+
+		if(myRank == 0){
+			//			for(int i = 0 ; i < nCols ; i++)
+			//				cout << bottomDiagonal[i]<< " ";
+			//			cout << endl;
+			//			for(int i = 0 ; i < nCols ; i++)
+			//				cout  << diagonal[i]<< " ";
+			//			cout << endl;
+			//			for(int i = 0 ; i < nCols ; i++)
+			//				cout << upDiagonal[i]<< " ";
+			//			cout << endl;
+			for(int i = 0 ; i < nCols ; i++)
+				cout  << resultVector[i]<< " ";
+			cout << endl;
+			for(int i = 0 ; i < nCols ; i++)
+				cout << f[i] << " ";
+			cout << endl;
 		}
 	}
 
@@ -102,7 +102,7 @@ Matrix Laasonen::computeSolution(){
 	return m;
 }
 
-
+//Thanks to George Em Karniadakis and Robert M. Kirby for the algorithm, http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.706.6668&rep=rep1&type=pdf
 void Laasonen::ThomasAlgorithm_P( int N, double *b,double *a, double *c, double *x, double *q){
 	int i;
 	int rows_local,local_offset;

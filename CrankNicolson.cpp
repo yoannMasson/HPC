@@ -86,11 +86,6 @@ Matrix CrankNicolson::computeSolution(){
 				//m[timeStep][i] = f[i-1];
 				//resultVector[i-1] = f[i-1];
 			}
-
-			for(int i = 0; i < nCols ; i++){
-				cout << resultVector[i] << " ";
-			}
-			cout <<endl;
 		}
 		for(int i = 0; i < nCols ; i++){
 			m[timeStep][i+1]  = resultVector[i];
@@ -102,7 +97,7 @@ Matrix CrankNicolson::computeSolution(){
 	return m;
 }
 
-
+//Tanks to George Em Karniadakis and Robert M. Kirby for the algorithm, http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.706.6668&rep=rep1&type=pdf
 void CrankNicolson::ThomasAlgorithm_P( int N, double *b,double *a, double *c, double *x, double *q){
 	int i;
 	int rows_local,local_offset;

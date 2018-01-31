@@ -21,75 +21,67 @@ const double DT = 0.01;
 
 int main(int argc, char *argv[]) {
 
-	char choice('2');
+	char choice('3');
 	double t0,t1;
 
 	MPI_Init(&argc, &argv);
 
-	MPI_Status status;
-	int myRank,npes,send[10],recieve[10];
+
+	int myRank,npes;
 	MPI_Comm_size(MPI_COMM_WORLD, &npes);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 	ofstream f;
 
-	Analytic analytic(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);//Use to compute errors
-	FTCS dufortFrankel(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
+	FTCS ftcs(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 	Laasonen laasonen(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 	CrankNicolson crankNicholson(DX,DT,THICNESS,T,D,TSUR,TIN,npes,myRank);
 
-
-	cout << fixed;
-	cout << setprecision(2);
-
-	Solver *solution;
-
-	//analytic.computeSolution();
-
-	switch (choice) {
-
-	case '1':
-		solution = &dufortFrankel;
-		f.open ("DufortFrankel");
-		break;
-
-	case '2':
-		solution = &laasonen;
-		f.open ("Laasonen");
-		break;
-
-	case '3':
-		solution = &crankNicholson;
-		f.open ("CrankNicholson");
-		break;
-
-	case '4':
-		solution = &analytic;
-		f.open ("Analytic");
-		break;
-	}
+	//Compute FTCS
 
 	t0 = MPI_Wtime();
-	solution->computeSolution();
+	ftcs.computeSolution();
 	t1 = MPI_Wtime();
+	//
+	//	if(myRank == 0){
+	//		cout << setprecision(4);
+	//		cout << "FTCS Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
+	//		cout << setprecision(2);
+	//		cout << fixed;
+	//		cout << ftcs;
+	//	}
+	//
+	if ((npes & (npes - 1)) == 0 && npes > 1 ){
+		//		//Compute Crank-Nicholson
+		//		t0 = MPI_Wtime();
+		//		crankNicholson.computeSolution();
+		//		t1 = MPI_Wtime();
+		//
+		//		if(myRank == 0){
+		//			cout << "CrankNicholson Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
+		//			cout << setprecision(2);
+		//			cout << fixed;
+		//			cout << crankNicholson << endl;;
+		//		}
 
+		//Compute Laasonen
+		t0 = MPI_Wtime();
+		laasonen.computeSolution();
+		t1 = MPI_Wtime();
 
+		if(myRank == 0){
+			cout << "Laasonen Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
+			cout << setprecision(2);
+			cout << fixed;
+			cout << laasonen << endl;
+		}
 
-	if(myRank == 0){
-		cout << solution->getComputedSolution();
-		cout << setprecision(8);
-		cout << t1-t0;
-
-		/*Matrix error = solution->getComputedSolution()-analytic.getComputedSolution();
-		cout << "it took "<< t1-t0 << " ms to compute" << endl;
-		cout << "ERRORS: "<< endl;
-		cout << "one norm: "<< error.one_norm()<< endl;
-		cout << "second norm: "<< error.two_norm()<< endl;
-		cout << "uniform norm: "<< error.uniform_norm()<< endl;*/
-		f << fixed;
-		f << setprecision(2);
-		f << *solution;
-		f.close();
+	}else{
+		if(myRank==0)
+			cout << " SORRY THE IMPLEMENTED ALGORITHM FOR LAASONEN AND CRANKNICHOLSON ONLY WORK WITH NUMBER OF PROCESSOR AS A POWER OF 2"<<endl;
 	}
+
+
+
 
 
 	MPI_Finalize();
