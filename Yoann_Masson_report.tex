@@ -3,7 +3,7 @@
 \usepackage[final]{pdfpages} 
 \title{Study of parallel algorithms applied to the Heat diffusion problem}
 \author{Yoann Masson \\ Student in Software Engineering at Cranfield University}
-\date{1\textsuperscript{st} of february, 2018}
+\date{1\textsuperscript{st} of February, 2018}
 
 \graphicspath{{plot/}}
 \begin{document}
@@ -86,9 +86,9 @@ The important fact to look at, when considering time performance, is strong scal
 \includegraphics[scale=0.5]{report/strongFTCS}
 \caption{Strong scalability FTCS}
 \end{figure}
-The above figure shows the computation time per processor used. The tendancie is clear, the more processor there is the less performance we get. It can be explained by two reasons:
+The above figure shows the computation time per processor used. The tendency is clear, the more processor there is the less performance we get. It can be explained by two reasons:
 \begin{itemize}
-\item the problem is not complex enough to requiere multi processor programming
+\item the problem is not complex enough to require multi processor programming
 \item the problem is too small
 \end{itemize} 
 To see what it is, we need to study weak scalability. This is the aptitude for the program to follow the size of the problem with the number of processor. In other words, if we double the problem we should double the number of processor and expect no change in time.
@@ -98,10 +98,40 @@ To see what it is, we need to study weak scalability. This is the aptitude for t
 \end{figure}
 We expected the computation time not to change too much, but the trend in processor number does not match the size of the problem.
 \\
-In conclusion, we can say that the explicit solver is not fit for multi-processor programming because the problem is not complex enough and communcating results takes longer than actually computing it.
+In conclusion, we can say that the explicit solver is not fit for multi-processor programming because the problem is not complex enough and communicating results takes longer than actually computing it.
 
 \chapter{Implicit Solver}
 \section{Theory}
+Once the implicit solver applied the formula becomes a PDE to solve (see more mathematic details in the appendix ), this is laasonen example:
+\begin{equation}
+\begin{pmatrix}
+1+2C & -C & 0 & ... & 0\\
+-C & 1+2C & -C& ... & 0\\
+...&...&...&...&...\\
+ 0 & ...& -C &1+2C & -C \\
+0 & ... &  0& -C & 1+2C
+\end{pmatrix}
+\begin{pmatrix}
+f\binom{n+1}{0}\\
+f\binom{n+1}{1}\\
+...\\
+...\\
+f\binom{n+1}{k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+f\binom{n}{0}\\
+f\binom{n}{1}\\
+...\\
+...\\
+f\binom{n}{k}
+\end{pmatrix}
+\end{equation}
+Contrary to explicit solvers, implicit solvers are more complex to solve. That is because, implicit solver relies on previous time step but also on current time step. The figures below show the stencil of Crank-Nicolson and Laasonen implicit solver.
+INSERT STENCIL.
+We can not split the matrix as we did with the explicit to split the task in this case, what I am using is a parallel version of thomas algorithm \\( \textit{\textbf{reference:} http://citeseerx.ist.psu.edu/viewdoc/\\download?doi=10.1.1.706.6668\&rep=rep1\&type=pdf p. 367 })
+
+
 
 \chapter{Implementation}
 Now that's we saw the theory and the results, let's take a look at the C++ implementation and the design of the application.
@@ -109,18 +139,18 @@ Now that's we saw the theory and the results, let's take a look at the C++ imple
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.5]{report/ClassDiagram.png}
-\caption{Class Diagramm}
+\caption{Class Diagram}
 \end{figure}
 
-This is the class diagram of the application implementing the three schemes and the analytic solution.  The\textit{Solver} class uses \textit{Matrix} to store the solution of the problem where rows are time steps and columns are space steps. \textit{Solver} declares the virtual method \textit{computeSolution()} so that classes that inherit from it need to give an implementation of \textit{computeSolution()} if they wish to be instanciated in a \textit{main} programm.\\
-The base class \textit{Solver} class holds all of the informations regarding the initial problem. Since it is attribut and not just hard-coded value in the code, all the child class are bounded to those values. Let's say that we want to see the solution with a surface temperature of 250\textsuperscript{o}F instead of 300\textsuperscript{o}F, we just have to instanciate the object with a different \textit{Tsur} value.
+This is the class diagram of the application implementing the three schemes and the analytic solution.  The\textit{Solver} class uses \textit{Matrix} to store the solution of the problem where rows are time steps and columns are space steps. \textit{Solver} declares the virtual method \textit{computeSolution()} so that classes that inherit from it need to give an implementation of \textit{computeSolution()} if they wish to be instanciated in a \textit{main} program.\\
+The base class \textit{Solver} class holds all of the information regarding the initial problem. Since it is attribute and not just hard-coded value in the code, all the child class are bounded to those values. Let's say that we want to see the solution with a surface temperature of 250\textsuperscript{o}F instead of 300\textsuperscript{o}F, we just have to instantiate the object with a different \textit{Tsur} value.
 \paragraph{functions}
 To print out the solution both in screen or in a file, I added the redefinition of the $"<<"$ operator. On screen, the matrix will print the solution value for time 0.5 and will write on a file in a way that would be exploitable by GNUPlot.
-I added the minus operator in the matrix class to be able to substract matrices in order to get the error matrix. \\When instanciated an object of a Solver child class, you have to respect some rules in order not to get exceptions. For example, it is impossible to have a \textit{dx} larger than a \textit{L} it would not make any sense, so the programm would raise an \textit{invalid\_argument} exception
+I added the minus operator in the matrix class to be able to subtract matrices in order to get the error matrix. \\When instantiated an object of a Solver child class, you have to respect some rules in order not to get exceptions. For example, it is impossible to have a \textit{dx} larger than a \textit{L} it would not make any sense, so the program would raise an \textit{invalid\_argument} exception
 \begin{appendix}
 \clearpage
 \phantomsection
-\chapter{Mathematic derivation}
+\chapter{Mathematics derivation}
  
 \paragraph{Dufort-Frankel}
 \begin{equation}\frac{\partial T}{\partial t} = D\frac{\partial^2T }{\partial x^2}

@@ -8,8 +8,7 @@
 \contentsline {chapter}{\numberline {3}Implementation}{10}
 \contentsline {paragraph}{Class Diagram}{10}
 \contentsline {paragraph}{functions}{11}
-\contentsline {chapter}{\numberline {A}Mathematic derivation}{12}
+\contentsline {chapter}{\numberline {A}Mathematics derivation}{12}
 \contentsline {paragraph}{Dufort-Frankel}{12}
 \contentsline {paragraph}{Laasonen}{12}
 \contentsline {paragraph}{Crank Nicolson}{12}
-\contentsline {chapter}{\numberline {B}Queue file}{14}
