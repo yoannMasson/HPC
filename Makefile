@@ -1,5 +1,5 @@
 all: 
-	mpicxx ./*.cpp 
+	mpicxx -o test ./*.cpp 
 
 run: all
-	mpirun -n 2 ./a.out
+	mpirun -n 2 ./test

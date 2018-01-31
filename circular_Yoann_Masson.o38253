@@ -1,0 +1,5 @@
+Hello world from processor dcn027, rank 2 out of 4 processors
+Hello world from processor dcn027, rank 0 out of 4 processors
+Hello world from processor dcn027, rank 1 out of 4 processors
+Hello world from processor dcn027, rank 3 out of 4 processors
+rm: cannot remove '/mnt/gpfs0/home/s274502/HPC2/HPC/': Is a directory
