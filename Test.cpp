@@ -41,27 +41,26 @@ int main(int argc, char *argv[]) {
 	t0 = MPI_Wtime();
 	ftcs.computeSolution();
 	t1 = MPI_Wtime();
-	//
-	//	if(myRank == 0){
-	//		cout << setprecision(4);
-	//		cout << "FTCS Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
-	//		cout << setprecision(2);
-	//		cout << fixed;
-	//		cout << ftcs;
-	//	}
-	//
+
+	if(myRank == 0){
+		cout << setprecision(4);
+		cout << "FTCS Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
+		cout << setprecision(2);
+		cout << fixed;
+		cout << ftcs;
+	}
+
 	if ((npes & (npes - 1)) == 0 && npes > 1 ){
-		//		//Compute Crank-Nicholson
-		//		t0 = MPI_Wtime();
-		//		crankNicholson.computeSolution();
-		//		t1 = MPI_Wtime();
-		//
-		//		if(myRank == 0){
-		//			cout << "CrankNicholson Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
-		//			cout << setprecision(2);
-		//			cout << fixed;
-		//			cout << crankNicholson << endl;;
-		//		}
+		//Compute Crank-Nicholson
+		t0 = MPI_Wtime();
+		crankNicholson.computeSolution();
+		t1 = MPI_Wtime();
+		if(myRank == 0){
+			cout << "CrankNicholson Result took " << (t1-t0)*1000 << "ms to compute with "<<npes<<" processors"<<endl;
+			cout << setprecision(2);
+			cout << fixed;
+			cout << crankNicholson << endl;;
+		}
 
 		//Compute Laasonen
 		t0 = MPI_Wtime();

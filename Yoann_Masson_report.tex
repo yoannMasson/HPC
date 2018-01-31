@@ -1,5 +1,5 @@
 \documentclass[12pt, a4paper]{report}
-\usepackage {graphicx,booktabs, gensymb,amsmath,appendix}
+\usepackage {graphicx,booktabs, gensymb,amsmath,appendix,float}
 \usepackage[final]{pdfpages} 
 \title{Study of parallel algorithms applied to the Heat diffusion problem}
 \author{Yoann Masson \\ Student in Software Engineering at Cranfield University}
@@ -44,17 +44,34 @@ In this report we will study through explicit and implicit solvers the impact of
 \chapter{Explicit solver: FTCS}
 \section{Theory}
 
-The forward in time central in space, FTCS, explicit solver requires just simple operations to compute point in time and spaces, the formula becomes (see more in the appendix):\begin{equation}f\binom{n+1}{i} = D\frac{\Delta t}{\Delta x^{2}}(f\binom{n}{i+1}-2f\binom{n}{i}+f\binom{n}{i-1}))+f\binom{n}{i}
+The forward in time central in space, FTCS, explicit solver requires just simple operations to compute points in time and spaces, the formula becomes (see more in the appendix):\begin{equation}f\binom{n+1}{i} = D\frac{\Delta t}{\Delta x^{2}}(f\binom{n}{i+1}-2f\binom{n}{i}+f\binom{n}{i-1}))+f\binom{n}{i}
 \end{equation} 
 This equation means that to compute the next time step $f\binom{n+1}{i}$ we need the previous results from $f\binom{n}{i+1}$, $f\binom{n}{i}$ and $f\binom{n}{i-1}$.\\
 \includegraphics[scale=0.4]{report/stencil.png}\\
-The basic technique of multi-processors programming is splitting the tasks between multiples processors meaning that the result matrix is going to be split. But how ? it could be horizontally, vertically and in cube where every processor is in charge of one part of the matrix, see picture below.\\
-
-\includegraphics[scale=0.3]{report/vertical.png} \includegraphics[scale=0.3]{report/horizontal.png}\\ \includegraphics[scale=0.4]{report/cube.png} \\
+The basic technique of multi-processors programming is splitting the tasks between multiples processors meaning that the result matrix is going to be split. But how ? it could be horizontally, vertically and in cube where every processor is in charge of one part of the matrix, see figures below.
+\begin{figure}
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{report/vertical.png}
+  \caption{Vertical split}\
+\endminipage\hfill
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{report/horizontal}
+  \caption{Horizontal split}
+\endminipage\hfill
+\end{figure}
+\begin{figure}
+\includegraphics[scale=0.4]{report/cube.png} 
+\caption{Cube split}
+\end{figure}
+\section*{}
 To chose a way of dividing the matrix, we need to take a look of the dependencies between the different point in time and space, the stencil.
-Looking at the equation stencil, it is clear that if we split the matrix horizontally ( meaning each matrix would take care of a time step and every space step ) the performance would not increase because for one processor to compute it would have to wait for the previous processor to finish its job. Making the program serial because only one processor would be working at a time.\\
+Looking at the equation stencil, it is clear that if we split the matrix horizontally ( meaning each matrix would take care of a time step and every space step ) the performance would not increase because for one processor to compute it, it would have to wait for the previous processor to finish its job. Making the program serial because only one processor would be working at a time.\\
 So we will be splitting the matrix vertically. It implies that when reaching a "boundary", the processor has to receive and send a result to its neighbor processor.\\
+\begin{figure}[H]
 \includegraphics[scale=0.5]{report/stencilVertical.png}\\
+\caption{FTCS stencil}
+\end{figure}
+
 The above picture represents how the work is divided in this particular case, the green arrow are value that does not need to be transferred because the processor already has the correct value meanwhile the blue arrows represents value that are transmitted from one processor to another.
 \section{Results}
 	As discuss earlier, there is a dilemma between the gain of processing time and the inferred communication costs. The more processor you have, the smallest the sub matrices are but the more communication there is.\\
@@ -63,7 +80,126 @@ The above picture represents how the work is divided in this particular case, th
 	The result from the parallel program are the same as the one with the serial program which is a good thing, because some precision can be lost during the communication. Here is the plot of the value for $t=0.5$.\\
 \includegraphics[scale=0.5]{report/FTCS}
 \subsection{Time performance}
-We can assume that the time for the serial program and the time for the parallel program with one processor is the same. After verification, it is. The time is 0.1 ms on average of 10 tries.
+We can assume that the time for the serial program and the time for the parallel program with one processor is the same. After verification, it is. The time is 0.1 ms on average of 10 tries.\\
+The important fact to look at, when considering time performance, is strong scalability and weak scalability. Strong scalability is the aptitude of a program to gain time by adding more CPU.\\
+\begin{figure}[H]
+\includegraphics[scale=0.5]{report/strongFTCS}
+\caption{Strong scalability FTCS}
+\end{figure}
+The above figure shows the computation time per processor used. The tendancie is clear, the more processor there is the less performance we get. It can be explained by two reasons:
+\begin{itemize}
+\item the problem is not complex enough to requiere multi processor programming
+\item the problem is too small
+\end{itemize} 
+To see what it is, we need to study weak scalability. This is the aptitude for the program to follow the size of the problem with the number of processor. In other words, if we double the problem we should double the number of processor and expect no change in time.
+\begin{figure}[H]
+\includegraphics[scale=0.5]{report/weakFTCS}
+\caption{Weak scalability FTCS}
+\end{figure}
+We expected the computation time not to change too much, but the trend in processor number does not match the size of the problem.
+\\
+In conclusion, we can say that the explicit solver is not fit for multi-processor programming because the problem is not complex enough and communcating results takes longer than actually computing it.
 
+\chapter{Implicit Solver}
+\section{Theory}
+
+\chapter{Implementation}
+Now that's we saw the theory and the results, let's take a look at the C++ implementation and the design of the application.
+\paragraph{Class Diagram}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{report/ClassDiagram.png}
+\caption{Class Diagramm}
+\end{figure}
+
+This is the class diagram of the application implementing the three schemes and the analytic solution.  The\textit{Solver} class uses \textit{Matrix} to store the solution of the problem where rows are time steps and columns are space steps. \textit{Solver} declares the virtual method \textit{computeSolution()} so that classes that inherit from it need to give an implementation of \textit{computeSolution()} if they wish to be instanciated in a \textit{main} programm.\\
+The base class \textit{Solver} class holds all of the informations regarding the initial problem. Since it is attribut and not just hard-coded value in the code, all the child class are bounded to those values. Let's say that we want to see the solution with a surface temperature of 250\textsuperscript{o}F instead of 300\textsuperscript{o}F, we just have to instanciate the object with a different \textit{Tsur} value.
+\paragraph{functions}
+To print out the solution both in screen or in a file, I added the redefinition of the $"<<"$ operator. On screen, the matrix will print the solution value for time 0.5 and will write on a file in a way that would be exploitable by GNUPlot.
+I added the minus operator in the matrix class to be able to substract matrices in order to get the error matrix. \\When instanciated an object of a Solver child class, you have to respect some rules in order not to get exceptions. For example, it is impossible to have a \textit{dx} larger than a \textit{L} it would not make any sense, so the programm would raise an \textit{invalid\_argument} exception
+\begin{appendix}
+\clearpage
+\phantomsection
+\chapter{Mathematic derivation}
+ 
+\paragraph{Dufort-Frankel}
+\begin{equation}\frac{\partial T}{\partial t} = D\frac{\partial^2T }{\partial x^2}
+\end{equation} 
+\begin{equation}\frac{f\binom{n+1}{i} - f\binom{n}{i}}{\Delta t} = D\frac{f\binom{n}{i+1} - 2*f\binom{n}{i} +f\binom{n}{i-1}}{\Delta x^{2}}
+\end{equation} 
+\begin{equation}
+f\binom{n+1}{i} = D\frac{\Delta t}{\Delta x^{2}}(f\binom{n}{i+1}-2f\binom{n}{i}+f\binom{n}{i-1}))+f\binom{n}{i}
+\end{equation} 
+\paragraph{Laasonen}
+\begin{equation}\frac{\partial T}{\partial t} = D\frac{\partial^2T }{\partial x^2}
+\end{equation} 
+\begin{equation}\frac{f\binom{n+1}{i} - f\binom{n}{i}}{\Delta t} = D\frac{f\binom{n+1}{i+1} - 2f\binom{n+1}{i}+ f\binom{n+1}{i-1}}{\Delta x^{2}}
+\end{equation} 
+\begin{equation}f\binom{n}{i} = -Cf\binom{n+1}{i+1}+(1+2C)f\binom{n+1}{i}-Cf\binom{n+1}{i-1}
+   \text{ with }
+C = D\frac{\Delta t}{\Delta x^{2}}
+\end{equation}
+\begin{equation}
+\begin{pmatrix}
+1+2C & -C & 0 & ... & 0\\
+-C & 1+2C & -C& ... & 0\\
+...&...&...&...&...\\
+ 0 & ...& -C &1+2C & -C \\
+0 & ... &  0& -C & 1+2C
+\end{pmatrix}
+\begin{pmatrix}
+f\binom{n+1}{0}\\
+f\binom{n+1}{1}\\
+...\\
+...\\
+f\binom{n+1}{k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+f\binom{n}{0}\\
+f\binom{n}{1}\\
+...\\
+...\\
+f\binom{n}{k}
+\end{pmatrix}
+\end{equation}
+\paragraph{Crank Nicolson}
+\begin{equation}\frac{\partial T}{\partial t} = D\frac{\partial^2T }{\partial x^2}
+\end{equation} 
+\begin{equation}\frac{f\binom{n+1}{i} - f\binom{n}{i}}{\Delta t} = D\frac{f\binom{n}{i+1} - 2f\binom{n}{i}+ f\binom{n}{i-1}}{2\Delta x^{2}}+D\frac{f\binom{n+1}{i+1} - 2f\binom{n+1}{i}+ f\binom{n+1}{i-1}}{2\Delta x^{2}}
+\end{equation} 
+\begin{equation}-Cf\binom{n+1}{i+1}+(1+2C)f\binom{n+1}{i}-Cf\binom{n+1}{i-1} = Cf\binom{n}{i+1}+(1-2C)f\binom{n}{i}+Cf\binom{n}{i-1}
+\end{equation}
+\begin{equation}
+\begin{pmatrix}
+1+2C & -C & 0 & ... & 0\\
+-C & 1+2C & -C& ... & 0\\
+...&...&...&...&...\\
+ 0 & ...& -C &1+2C & -C \\
+0 & ... &  0& -C & 1+2C
+\end{pmatrix}
+\begin{pmatrix}
+f\binom{n+1}{0}\\
+f\binom{n+1}{1}\\
+...\\
+...\\
+f\binom{n+1}{k}
+\end{pmatrix}
+= 
+\end{equation}
+\begin{equation}
+\begin{pmatrix}
+Cf\binom{n}{1}+(1-2C)f\binom{n}{0}+C*Tsurface\\
+Cf\binom{n}{2}+(1-2C)f\binom{n}{1}+Cf\binom{n}{0}\\
+...\\
+...\\
+C*Tsurface+(1-2C)f\binom{n}{k}+Cf\binom{n}{k-1}
+\end{pmatrix}
+   \text{ with }
+C = D\frac{\Delta t}{\Delta x^{2}}
+\end{equation}
+
+
+\end{appendix}
 
 \end{document}
