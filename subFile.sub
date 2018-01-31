@@ -10,7 +10,7 @@
 ## STEP 1:
 ## Enter a job name after the -N on the line below:
 ##
-#PBS -N circular_Yoann_Masson
+#PBS -N Yoann_Masson
 ##
 ## STEP 2:
 ## Select the number of cpus/cores required by modifying the #PBS -l select line below

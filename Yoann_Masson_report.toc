@@ -4,6 +4,7 @@
 \contentsline {subsection}{\numberline {1.2.1}Numerical value}{6}
 \contentsline {subsection}{\numberline {1.2.2}Time performance}{6}
 \contentsline {chapter}{\numberline {2}Implicit Solver}{9}
+\contentsline {section}{\numberline {2.1}Theory}{9}
 \contentsline {chapter}{\numberline {3}Implementation}{10}
 \contentsline {paragraph}{Class Diagram}{10}
 \contentsline {paragraph}{functions}{11}
@@ -11,3 +12,4 @@
 \contentsline {paragraph}{Dufort-Frankel}{12}
 \contentsline {paragraph}{Laasonen}{12}
 \contentsline {paragraph}{Crank Nicolson}{12}
+\contentsline {chapter}{\numberline {B}Queue file}{14}
