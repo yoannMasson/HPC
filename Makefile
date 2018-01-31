@@ -2,4 +2,4 @@ all:
 	mpicxx ./*.cpp 
 
 run: all
-	mpirun -n 2 ./a.out
+	mpirun -n 4 ./a.out

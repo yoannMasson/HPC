@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.8)  30 JAN 2018 16:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.8)  31 JAN 2018 16:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -143,6 +143,14 @@ Package: appendix 2009/09/02 v1.2b extra appendix facilities
 \c@@ppsavesec=\count106
 \c@@ppsaveapp=\count107
 )
+(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count108
+\float@exts=\toks20
+\float@box=\box28
+\@float@everytoks=\toks21
+\@floatcapt=\box29
+)
 (/usr/share/texlive/texmf-dist/tex/latex/pdfpages/pdfpages.sty
 Package: pdfpages 2015/09/18 v0.5d Insert pages of external PDF documents (AM)
 
@@ -151,15 +159,15 @@ Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count108
-\calc@Bcount=\count109
+\calc@Acount=\count109
+\calc@Bcount=\count110
 \calc@Adimen=\dimen127
 \calc@Bdimen=\dimen128
 \calc@Askip=\skip46
 \calc@Bskip=\skip47
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count110
+\calc@Ccount=\count111
 \calc@Cskip=\skip48
 )
 (/usr/share/texlive/texmf-dist/tex/latex/eso-pic/eso-pic.sty
@@ -195,10 +203,10 @@ Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
 (/usr/share/texlive/texmf-dist/tex/latex/pdfpages/pppdftex.def
 File: pppdftex.def 2015/09/18 v0.5d Pdfpages driver for pdfTeX (AM)
 )
-\AM@pagebox=\box28
-\AM@toc@title=\toks20
-\c@AM@survey=\count111
-\AM@templatesizebox=\box29
+\AM@pagebox=\box30
+\AM@toc@title=\toks22
+\c@AM@survey=\count112
+\AM@templatesizebox=\box31
 )
 (./Yoann_Masson_report.aux)
 \openout1 = `Yoann_Masson_report.aux'.
@@ -218,17 +226,17 @@ LaTeX Font Info:    ... okay on input line 9.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count112
+\scratchcounter=\count113
 \scratchdimen=\dimen131
-\scratchbox=\box30
-\nofMPsegments=\count113
-\nofMParguments=\count114
-\everyMPshowfont=\toks21
-\MPscratchCnt=\count115
+\scratchbox=\box32
+\nofMPsegments=\count114
+\nofMParguments=\count115
+\everyMPshowfont=\toks23
+\MPscratchCnt=\count116
 \MPscratchDim=\dimen132
-\MPnumerator=\count116
-\makeMPintoPDFobject=\count117
-\everyMPtoPDFconversion=\toks22
+\MPnumerator=\count117
+\makeMPintoPDFobject=\count118
+\everyMPtoPDFconversion=\toks24
 ) (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
 Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
 )
@@ -284,7 +292,7 @@ Package gensymb Info: Using \Omega for \ohm on input line 9.
 
 Package gensymb Warning: Not defining \micro.
 
-\AtBeginShipoutBox=\box31
+\AtBeginShipoutBox=\box33
 (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/pdflscape.sty
 Package: pdflscape 2008/08/11 v0.10 Display of landscape pages in PDF (HO)
 
@@ -327,39 +335,40 @@ File: report/stencil.png Graphic file (type png)
 Package pdftex.def Info: report/stencil.png used on input line 50.
 (pdftex.def)             Requested size: 211.58675pt x 144.53743pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 48--52
-
- []
-
 <report/vertical.png, id=25, 627.34375pt x 509.905pt>
 File: report/vertical.png Graphic file (type png)
 
 <use report/vertical.png>
-Package pdftex.def Info: report/vertical.png used on input line 53.
-(pdftex.def)             Requested size: 188.20457pt x 152.97267pt.
+Package pdftex.def Info: report/vertical.png used on input line 54.
+(pdftex.def)             Requested size: 195.0pt x 158.49684pt.
 
 <report/horizontal.png, id=26, 649.42625pt x 519.9425pt>
 File: report/horizontal.png Graphic file (type png)
 
 <use report/horizontal.png>
-Package pdftex.def Info: report/horizontal.png used on input line 53.
-(pdftex.def)             Requested size: 194.82938pt x 155.98395pt.
+Package pdftex.def Info: report/horizontal.png used on input line 58.
+(pdftex.def)             Requested size: 195.0pt x 156.11882pt.
  <report/cube.png, id=27, 710.655pt x 532.99126pt>
 File: report/cube.png Graphic file (type png)
 
 <use report/cube.png>
-Package pdftex.def Info: report/cube.png used on input line 53.
+Package pdftex.def Info: report/cube.png used on input line 63.
 (pdftex.def)             Requested size: 284.25696pt x 213.19272pt.
 
 <report/stencilVertical.png, id=28, 439.6425pt x 265.99374pt>
 File: report/stencilVertical.png Graphic file (type png)
 
 <use report/stencilVertical.png>
-Package pdftex.def Info: report/stencilVertical.png used on input line 57.
+Package pdftex.def Info: report/stencilVertical.png used on input line 71.
 (pdftex.def)             Requested size: 219.82071pt x 132.99654pt.
 
-Overfull \hbox (13.26985pt too wide) in paragraph at lines 53--59
-[][] [] 
+Underfull \hbox (badness 10000) in paragraph at lines 71--72
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 67--73
+
  []
 
 [3
@@ -369,33 +378,78 @@ Overfull \hbox (13.26985pt too wide) in paragraph at lines 53--59
 File: report/FTCS.png Graphic file (type png)
 
 <use report/FTCS.png>
-Package pdftex.def Info: report/FTCS.png used on input line 64.
+Package pdftex.def Info: report/FTCS.png used on input line 81.
 (pdftex.def)             Requested size: 317.18422pt x 224.83945pt.
- [5 <./report/stencilVertical.png>] [6 <./report/FTCS.png>] (./Yoann_Masson_rep
-ort.aux) ) 
+ [5 <./report/stencilVertical.png>]
+<report/strongFTCS.png, id=48, 625.33624pt x 449.68pt>
+File: report/strongFTCS.png Graphic file (type png)
+
+<use report/strongFTCS.png>
+Package pdftex.def Info: report/strongFTCS.png used on input line 86.
+(pdftex.def)             Requested size: 312.66736pt x 224.83945pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--88
+
+ []
+
+[6 <./report/FTCS.png>] <report/weakFTCS.png, id=52, 639.38875pt x 451.6875pt>
+File: report/weakFTCS.png Graphic file (type png)
+
+<use report/weakFTCS.png>
+Package pdftex.def Info: report/weakFTCS.png used on input line 96.
+(pdftex.def)             Requested size: 319.69359pt x 225.84319pt.
+ [7 <./report/strongFTCS.png>] [8 <./report/weakFTCS.png>]
+Chapter 2.
+[9
+
+]
+Chapter 3.
+<report/ClassDiagram.png, id=62, 723.70375pt x 459.7175pt>
+File: report/ClassDiagram.png Graphic file (type png)
+
+<use report/ClassDiagram.png>
+Package pdftex.def Info: report/ClassDiagram.png used on input line 109.
+(pdftex.def)             Requested size: 361.85098pt x 229.85818pt.
+ [10
+
+ <./report/ClassDiagram.png>] [11]
+Appendix A.
+
+Overfull \hbox (74.18655pt too wide) detected at line 170
+\OMS/cmsy/m/n/12 ^^@\OML/cmm/m/it/12 Cf[] \OT1/cmr/m/n/12 + (1 + 2\OML/cmm/m/it
+/12 C\OT1/cmr/m/n/12 )\OML/cmm/m/it/12 f[] \OMS/cmsy/m/n/12 ^^@ \OML/cmm/m/it/1
+2 Cf[] \OT1/cmr/m/n/12 = \OML/cmm/m/it/12 Cf[] \OT1/cmr/m/n/12 + (1 \OMS/cmsy/m
+/n/12 ^^@ \OT1/cmr/m/n/12 2\OML/cmm/m/it/12 C\OT1/cmr/m/n/12 )\OML/cmm/m/it/12 
+f[] \OT1/cmr/m/n/12 + \OML/cmm/m/it/12 Cf[]
+ []
+
+[12
+
+
+] [13] (./Yoann_Masson_report.aux) ) 
 Here is how much of TeX's memory you used:
- 3660 strings out of 494910
- 50810 string characters out of 6179836
- 117974 words of memory out of 5000000
- 6882 multiletter control sequences out of 15000+600000
+ 3735 strings out of 494910
+ 51951 string characters out of 6179836
+ 124351 words of memory out of 5000000
+ 6950 multiletter control sequences out of 15000+600000
  10886 words of font info for 39 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 38i,6n,39p,990b,203s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmti12.pfb>
-Output written on Yoann_Masson_report.pdf (8 pages, 147732 bytes).
+ 38i,9n,39p,990b,296s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on Yoann_Masson_report.pdf (15 pages, 200489 bytes).
 PDF statistics:
- 87 PDF objects out of 1000 (max. 8388607)
- 54 compressed objects within 1 object stream
+ 113 PDF objects out of 1000 (max. 8388607)
+ 69 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 

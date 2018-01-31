@@ -13,14 +13,14 @@
 using namespace std;
 
 Laasonen::Laasonen(double dx, double dt, double L, double T, double D, double Tsur, double Tin, int npes, int myRank ):
-																																										Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
+																																																		Solver (dx, dt, L, T, D, Tsur, Tin,npes,myRank){}
 
 
 Matrix Laasonen::computeSolution(){
 
 	Matrix m = getComputedSolution();//Matrix containing the result
 	int nRows = m.getNrows();
-	int nCols = m.getNcols()-2;//We remove the boundary conditions, that are not going to change through time
+	int nCols = m.getNcols();//We remove the boundary conditions, that are not going to change through time
 	double const C = D*dt/(2*dx*dx);
 
 
@@ -33,8 +33,8 @@ Matrix Laasonen::computeSolution(){
 
 	//initialisation
 	for (int i = 0; i < nRows; i++) {
-		for (int j = 0; j < nCols+2 ; j++) {
-			if(j == 0 || j == nCols+1){
+		for (int j = 0; j < nCols ; j++) {
+			if(j == 0 || j == nCols-1){
 				m[i][j] = Tsur;
 			}else{
 				m[i][j] = Tin;
@@ -55,12 +55,12 @@ Matrix Laasonen::computeSolution(){
 	}
 
 	for(int i = 0 ; i < nCols ; i++){
-		resultVector[i] = m[0][i+1];
+		resultVector[i] = m[0][i];
 	}
 
 	//f is the fist time step at initialization
 	for(int i = 0 ; i < nCols; i++){
-		f[i] = Tin;
+		f[i] = m[0][i];
 	}
 
 	//Calcul
@@ -69,16 +69,13 @@ Matrix Laasonen::computeSolution(){
 		for(int i = 0 ; i < nCols ; i++){
 			resultVector[i] = f[i];
 		}
+
+
 		resultVector[0] += C*Tsur;
-		resultVector[nCols-1] += C*Tsur;
-		ThomasAlgorithm_P(nCols,bottomDiagonal,diagonal,upDiagonal,f,resultVector);
-
-		for(int i = 0; i < nCols ; i++){
-			f[i] = resultVector[i];
-			m[timeStep][i+1] = f[i];
-		}
-
-
+		resultVector[nCols -1 ] += C*Tsur;
+		ThomasAlgorithm_P(nCols-1,bottomDiagonal,diagonal,upDiagonal,f,resultVector);
+		f[0] = Tsur;
+		f[nCols-1] = Tsur;
 		if(myRank == 0){
 			//			for(int i = 0 ; i < nCols ; i++)
 			//				cout << bottomDiagonal[i]<< " ";
@@ -89,13 +86,23 @@ Matrix Laasonen::computeSolution(){
 			//			for(int i = 0 ; i < nCols ; i++)
 			//				cout << upDiagonal[i]<< " ";
 			//			cout << endl;
-			for(int i = 0 ; i < nCols ; i++)
-				cout  << resultVector[i]<< " ";
-			cout << endl;
-			for(int i = 0 ; i < nCols ; i++)
-				cout << f[i] << " ";
-			cout << endl;
+			for(int i = 0; i < nCols /2 ;i++){
+				f[nCols-i-1] = f[i];
+			}
+			//			for(int i = 0 ; i < nCols ; i++)
+			//				cout  << resultVector[i]<< " ";
+			//			cout << endl;
+			//			for(int i = 0 ; i < nCols ; i++)
+			//				cout << f[i] << " ";
+			//			cout << endl;
 		}
+
+		for(int i = 0; i < nCols ; i++){
+			m[timeStep][i] = f[i];
+		}
+
+
+
 	}
 
 	(*this).computedSolution = m;
@@ -152,11 +159,9 @@ void Laasonen::ThomasAlgorithm_P( int N, double *b,double *a, double *c, double 
 	double np(npes);
 	for(i=0; i<=log2(np);i++){
 		if(myRank+pow(2,i) < npes)
-			MPI_Send(S,4,MPI_DOUBLE,int(myRank+pow(2,i)),0,
-					MPI_COMM_WORLD);
+			MPI_Send(S,4,MPI_DOUBLE,int(myRank+pow(2,i)),0,MPI_COMM_WORLD);
 		if(myRank-pow(2,i)>=0){
-			MPI_Recv(T,4,MPI_DOUBLE,int(myRank-pow(2,i)),0,
-					MPI_COMM_WORLD,&status);
+			MPI_Recv(T,4,MPI_DOUBLE,int(myRank-pow(2,i)),0,MPI_COMM_WORLD,&status);
 			s1tmp = S[0][0]*T[0][0] + S[0][1]*T[1][0];
 			S[0][1] = S[0][0]*T[0][1] + S[0][1]*T[1][1];
 			S[0][0] = s1tmp;
@@ -170,15 +175,12 @@ void Laasonen::ThomasAlgorithm_P( int N, double *b,double *a, double *c, double 
 	d[local_offset+rows_local-1] = (S[0][0] + S[0][1])/
 			(S[1][0] + S[1][1]);
 	if(myRank == 0){
-		MPI_Send(&d[local_offset+rows_local-1],1,MPI_DOUBLE,
-				1,0,MPI_COMM_WORLD);
+		MPI_Send(&d[local_offset+rows_local-1],1,MPI_DOUBLE,1,0,MPI_COMM_WORLD);
 	}
 	else{
-		MPI_Recv(&d[local_offset-1],1,MPI_DOUBLE,myRank-1,0,
-				MPI_COMM_WORLD,&status);
+		MPI_Recv(&d[local_offset-1],1,MPI_DOUBLE,myRank-1,0,MPI_COMM_WORLD,&status);
 		if(myRank != npes-1)
-			MPI_Send(&d[local_offset+rows_local-1],1,MPI_DOUBLE,
-					myRank+1,0,MPI_COMM_WORLD);
+			MPI_Send(&d[local_offset+rows_local-1],1,MPI_DOUBLE,myRank+1,0,MPI_COMM_WORLD);
 	}
 	// Compute in parallel the local values of d_k and l_k
 	if(myRank == 0){
